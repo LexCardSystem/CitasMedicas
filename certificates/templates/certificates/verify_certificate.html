@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify Certificate</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .container { max-width: 600px; margin: auto; border: 1px solid #ccc; padding: 20px; border-radius: 5px; }
+        .valid { color: green; border-left: 5px solid green; padding-left: 10px; }
+        .invalid { color: red; border-left: 5px solid red; padding-left: 10px; }
+        h2 { text-align: center; }
+        p { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Certificate Verification</h2>
+        {% if certificate %}
+            <div class="valid">
+                <h3>Certificate Details (Valid)</h3>
+                <p><strong>Identifier:</strong> {{ certificate.certificate_identifier }}</p>
+                <p><strong>Type:</strong> {{ certificate.certificate_type.name }}</p>
+                <p><strong>Patient:</strong> {{ certificate.patient.get_full_name|default:certificate.patient.username }}</p>
+                <p><strong>Issue Date:</strong> {{ certificate.issue_date|date:"F j, Y" }}</p>
+                {% if certificate.expiry_date %}
+                <p><strong>Expiry Date:</strong> {{ certificate.expiry_date|date:"F j, Y" }}</p>
+                {% endif %}
+            </div>
+        {% else %} {# This block might not be reached if Http404 is raised in view #}
+            <div class="invalid">
+                 <p>Certificate not found or identifier is invalid.</p>
+            </div>
+        {% endif %}
+        <p style="text-align: center; margin-top: 20px;"><a href="/">Return to Home</a></p> {# Or link to login #}
+    </div>
+</body>
+</html>

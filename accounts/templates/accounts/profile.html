@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile</title>
+</head>
+<body>
+    <h2>Welcome, {{ user.username }}!</h2>
+    <p>Email: {{ user.email }}</p>
+    <hr>
+    <p><a href="{% url 'appointment_history' %}">My Appointment History & Results</a></p>
+    <p><a href="{% url 'list_centers' %}">Book an Appointment</a></p> {# Link to scheduling #}
+    <hr>
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+</body>
+</html>

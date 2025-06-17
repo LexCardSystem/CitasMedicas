@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Appointment Details</title>
+    <style>
+        .lab-results { margin-top: 20px; }
+        .lab-results h4 { border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        .result-item { margin-bottom: 10px; }
+        .result-item strong { display: inline-block; width: 200px; } /* Adjusted width */
+        .abnormal { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Appointment Details</h2>
+    <p><strong>Service:</strong> {{ appointment.service.name }}</p>
+    <p><strong>Center:</strong> {{ appointment.center.name }}</p>
+    <p><strong>Date & Time:</strong> {{ appointment.start_time|date:"l, F j, Y, P" }}</p>
+    {% if appointment.doctor %}
+    <p><strong>Doctor:</strong> Dr. {{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username }}</p>
+    {% endif %}
+    <p><strong>Status:</strong> {{ appointment.get_status_display }}</p>
+    <p><strong>Appointment Code:</strong> {{ appointment.appointment_code }}</p>
+    {% if appointment.notes %}
+    <p><strong>Notes:</strong> {{ appointment.notes }}</p>
+    {% endif %}
+
+    <div class="lab-results">
+        <h3>Lab Results</h3>
+        {% if lab_results_for_appointment %}
+            {% for result_instance in lab_results_for_appointment %}
+                <h4>{{ result_instance.test_definition.name }}
+                    <small>(Collected: {{ result_instance.collection_datetime|date:"Y-m-d P"|default:"N/A" }},
+                           Reported: {{ result_instance.reported_datetime|date:"Y-m-d P"|default:"N/A" }})
+                    </small>
+                </h4>
+                {% if result_instance.notes_overall %}
+                    <p><em>Overall Notes: {{ result_instance.notes_overall }}</em></p>
+                {% endif %}
+                <ul>
+                {% for value in result_instance.values.all %}
+                    <li class="result-item {% if value.is_abnormal %}abnormal{% endif %}">
+                        <strong>{{ value.parameter_name_display }}:</strong>
+                        {{ value.get_value_display }}
+                        {% if value.is_abnormal %}(Abnormal){% endif %}
+                        {% if value.numeric_range_item_tested and value.numeric_range_item_tested.lower_bound_normal is not None %}
+                            (Ref: {{ value.numeric_range_item_tested.lower_bound_normal }} - {{ value.numeric_range_item_tested.upper_bound_normal }} {{ value.numeric_range_item_tested.unit }})
+                        {% elif value.list_value_selected and not value.list_value_selected.is_normal_value %}
+                            {# Attempt to show the 'normal' value for this list-based test #}
+                            {% with normal_item=value.list_value_selected.test_definition.list_items.filter(is_normal_value=True).first %}
+                                {% if normal_item %} (Normal: {{ normal_item.item_value }}) {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                        {% if value.value_notes %}<br><em><small>Notes: {{ value.value_notes }}</small></em>{% endif %}
+                    </li>
+                {% empty %}
+                    <li>No specific result values reported for this test yet.</li>
+                {% endfor %}
+                </ul>
+            {% endfor %}
+        {% else %}
+            <p>No lab results available for this appointment.</p>
+        {% endif %}
+    </div>
+
+    <p><a href="{% url 'appointment_history' %}">Back to Appointment History</a></p>
+</body>
+</html>

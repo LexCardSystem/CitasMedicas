@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate: {{ certificate.certificate_type.name }}</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; border: 5px double #333; padding: 30px; background-color: #fff; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; color: #2a5db0; }
+        .header h2 { margin: 5px 0; font-size: 1.5em; }
+        .patient-info, .cert-details { margin-bottom: 20px; line-height: 1.6; }
+        .patient-info p, .cert-details p { margin: 5px 0; }
+        .qr-code { float: right; width: 100px; height: 100px; border: 1px solid #ccc; padding: 5px; margin-left: 10px;}
+        .footer { text-align: center; font-size: 0.9em; color: #555; margin-top: 40px; }
+        .underline { border-bottom: 1px solid #000; display: inline-block; min-width: 150px; padding: 0 5px;}
+        .content { margin-top: 30px; text-align: justify; clear: both; }
+        .signature-area { margin-top: 50px; text-align: center; } /* Centered signature area */
+        .signature-line { border-bottom: 1px solid #000; width: 250px; margin: 40px auto 5px auto; display: block; }
+        .signature-title { text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Public Health Service</h2>
+        <h1>{{ certificate.certificate_type.name }}</h1>
+    </div>
+
+    {% if qr_code_img_base64 %}
+    <img src="data:image/png;base64,{{ qr_code_img_base64 }}" alt="QR Code" class="qr-code">
+    {% endif %}
+
+    <div class="patient-info">
+        <p><strong>Patient Name:</strong> <span class="underline">{{ certificate.patient.get_full_name|default:certificate.patient.username }}</span></p>
+        <p><strong>Patient ID/Username:</strong> <span class="underline">{{ certificate.patient.username }}</span></p>
+        {% if certificate.patient.email %}
+        <p><strong>Patient Email:</strong> <span class="underline">{{ certificate.patient.email }}</span></p>
+        {% endif %}
+    </div>
+
+    <div class="cert-details">
+        <p><strong>Certificate Identifier:</strong> <span class="underline">{{ certificate.certificate_identifier }}</span></p>
+        <p><strong>Date of Issue:</strong> <span class="underline">{{ certificate.issue_date|date:"F j, Y" }}</span></p>
+        {% if certificate.expiry_date %}
+        <p><strong>Date of Expiry:</strong> <span class="underline">{{ certificate.expiry_date|date:"F j, Y" }}</span></p>
+        {% endif %}
+        {% if certificate.appointment %}
+        <p><strong>Associated Appointment:</strong> {{ certificate.appointment.start_time|date:"F j, Y, P" }} (Code: {{ certificate.appointment.appointment_code }})</p>
+        {% endif %}
+    </div>
+
+    <div class="content">
+        <p>This is to certify that the above-named individual has fulfilled the necessary requirements for the
+        <strong>{{ certificate.certificate_type.name }}</strong> as per the records of the Public Health Service
+        dated {{ certificate.issue_date|date:"F j, Y" }}.</p>
+        {% if certificate.certificate_type.description %}
+        <p><em>Description: {{ certificate.certificate_type.description }}</em></p>
+        {% endif %}
+        {% if certificate.notes %}
+        <p><em>Notes: {{ certificate.notes }}</em></p>
+        {% endif %}
+    </div>
+
+    <div class="signature-area">
+        <div class="signature-line"></div>
+        <p class="signature-title">Authorized Signature</p>
+        <p class="signature-title">Public Health Service</p>
+    </div>
+
+    <div class="footer">
+        <p>This certificate is computer generated and is valid if presented with the QR code verification.</p>
+        {% if qr_code_url_display %}
+        <p>Verify at: {{ qr_code_url_display }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
