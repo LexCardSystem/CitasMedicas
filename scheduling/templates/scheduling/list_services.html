@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Services at {{ center.name }}</title>
+</head>
+<body>
+    <h2>Services at {{ center.name }}</h2>
+    <p>Operating Hours: {{ center.morning_start_time|time:"H:i" }} - {{ center.morning_end_time|time:"H:i" }}, {{ center.afternoon_start_time|time:"H:i" }} - {{ center.afternoon_end_time|time:"H:i" }}</p>
+    <ul>
+        {% for service in services %}
+        <li>
+            {{ service.name }} ({{ service.get_service_type_display }})
+            - Duration: {{ service.duration_minutes }} mins
+            {% if service.specific_start_time %}
+                - Available from {{ service.specific_start_time|time:"H:i" }} to {{ service.specific_end_time|time:"H:i" }}
+            {% endif %}
+            - <a href="{% url 'view_available_slots' center_id=center.pk service_id=service.pk %}">View Available Slots & Book</a>
+        </li>
+        {% empty %}
+        <li>No services available at this center.</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{% url 'list_centers' %}">Back to Centers</a></p>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Appointment History</title>
+    <style>
+        .appointment-list { list-style: none; padding: 0; }
+        .appointment-list li { margin-bottom: 15px; padding: 10px; border: 1px solid #eee; }
+        .appointment-list h4 { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <h2>My Appointment History</h2>
+
+    <h3>Upcoming Appointments</h3>
+    {% if upcoming_appointments %}
+        <ul class="appointment-list">
+            {% for appt in upcoming_appointments %}
+            <li>
+                <h4>{{ appt.service.name }} at {{ appt.center.name }}</h4>
+                <p><strong>Date & Time:</strong> {{ appt.start_time|date:"l, F j, Y, P" }}</p>
+                {% if appt.doctor %}
+                <p><strong>Doctor:</strong> Dr. {{ appt.doctor.user.get_full_name|default:appt.doctor.user.username }}</p>
+                {% endif %}
+                <p><strong>Status:</strong> {{ appt.get_status_display }}</p>
+                <p><strong>Code:</strong> {{ appt.appointment_code }}</p>
+                <p><a href="{% url 'appointment_detail' appt.id %}">View Details</a></p>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no upcoming appointments.</p>
+    {% endif %}
+
+    <h3>Past Appointments</h3>
+    {% if past_appointments %}
+        <ul class="appointment-list">
+            {% for appt in past_appointments %}
+            <li>
+                <h4>{{ appt.service.name }} at {{ appt.center.name }}</h4>
+                <p><strong>Date & Time:</strong> {{ appt.start_time|date:"l, F j, Y, P" }}</p>
+                {% if appt.doctor %}
+                <p><strong>Doctor:</strong> Dr. {{ appt.doctor.user.get_full_name|default:appt.doctor.user.username }}</p>
+                {% endif %}
+                <p><strong>Status:</strong> {{ appt.get_status_display }}</p>
+                <p><strong>Code:</strong> {{ appt.appointment_code }}</p>
+                <p><a href="{% url 'appointment_detail' appt.id %}">View Details & Results</a></p>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no past appointments.</p>
+    {% endif %}
+
+    <p><a href="{% url 'profile' %}">Back to Profile</a></p>
+</body>
+</html>

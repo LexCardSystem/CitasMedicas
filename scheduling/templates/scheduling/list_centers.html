@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Attention Center</title>
+</head>
+<body>
+    <h2>Select an Attention Center</h2>
+    <ul>
+        {% for center in centers %}
+        <li><a href="{% url 'list_services_at_center' center_id=center.pk %}">{{ center.name }}</a></li>
+        {% empty %}
+        <li>No attention centers available.</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{% url 'profile' %}">Back to Profile</a></p>
+</body>
+</html>
